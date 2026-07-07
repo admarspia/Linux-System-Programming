@@ -40,6 +40,7 @@ int main(int argc, char* argv[]){
     return -1;
   }
 
+  // Marche vite!
   printf("RESOURCE USAGE\nutime: %ld\tstime: %ld\nresidentset: %ld\tdata memeory: %ld\nstack memeroy: %ld\t#swap: %ld\n", ru_utime, ru_stime, ru_maxrss, ru_ixrss, ru_isrss, ru_nswap);
 
   return 0;
