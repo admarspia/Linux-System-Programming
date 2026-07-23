@@ -81,7 +81,6 @@ int main(int argc, char* argv[]) {
     resp.seqnum = seqnum;
 
     printf("waiting for connection\n");
-    printf("seqnum %d\n", seqnum);
     if (read(serverfd, &req, sizeof(struct request))
         != sizeof( struct request)){
       perror("read");
@@ -93,7 +92,7 @@ int main(int argc, char* argv[]) {
     snprintf(clientfifo, CLIENT_FIFO_NAME_LEN,
         CLIENT_FIFO_TEMPLATE, req.pid);
 
-    if ((clientfd = open(clientfifo, O_WRONLY)) == -1){
+    if ((clientfd = open(clientfifo, O_WRONLY | O_NONBLOCK)) == -1){
       perror("failed to open client fifo");
       continue;
     }
