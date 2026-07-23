@@ -38,17 +38,19 @@ int main(int arc, char* argv[]){
     exit(1);
   }
 
-  if ((clientfd = open(clientfifo, O_RDWR)) == -1){
+  if (write(serverfd, &req, sizeof(struct request)) != sizeof(struct request)){
+    perror("fild to write to server or partial write");
+    exit(1);
+  }
+
+  if ((clientfd = open(clientfifo, O_RDONLY)) == -1){
     perror("failed to open client fifo");
     exit(1);
   }
 
   printf("opened client fifo\n");
 
-  if (write(serverfd, &req, sizeof(struct request)) != sizeof(struct request)){
-    perror("fild to write to server or partial write");
-    exit(1);
-  }
+
   printf("wrote to server\n");
 
   if (read(clientfd, &resp, sizeof(struct response)) != sizeof(struct response)) {
