@@ -2,12 +2,50 @@
 #include "./seqnum.h"
 
 
+void removefifo(int sig){
+    unlink(SERVER_FIFO);
+    printf("server interapted\n");
+    exit(0);
+}
+
+void save_seqnum(long seqnum){
+  int backupfd;
+  if ((backupfd = open(BACKUP_FILE, O_CREAT | O_WRONLY | O_TRUNC | O_SYNC, 0644)) == -1){
+    perror("failed to write save seqence number\n");
+    return;
+  }
+
+  if (write(backupfd, &seqnum, sizeof(seqnum)) != sizeof(seqnum)){
+    perror("failed to write to backup\n");
+    return;
+  }
+}
+
+long get_seqnum(){
+  int backupfd; 
+  long seqnum;
+  if ((backupfd = open(BACKUP_FILE, O_RDONLY)) == -1){
+    save_seqnum(0);
+    return 0;
+  }
+
+  if (read(backupfd, &seqnum, sizeof(seqnum)) != sizeof(seqnum)){
+    perror("failed to read to backup\n");
+  }
+
+  return seqnum;
+
+}
+
+
+
+
 int main(int argc, char* argv[]) {
   int serverfd, dummyfd, clientfd;
   char clientfifo[CLIENT_FIFO_NAME_LEN];
   struct request req;
   struct response resp;
-  int seqnum = 0;
+  long seqnum = get_seqnum();
 
   umask(0);
 
@@ -34,6 +72,10 @@ int main(int argc, char* argv[]) {
     exit(1);
   }
 
+  if (signal(SIGINT,removefifo) == SIG_ERR){
+    printf("signal");
+    exit(0);
+  }
 
   for (;;){
     resp.seqnum = seqnum;
@@ -65,7 +107,9 @@ int main(int argc, char* argv[]) {
  
     printf("response send to client\n");
     seqnum +=  req.seqlen;
+    save_seqnum(seqnum);
     close(clientfd);
+    close(BACKUP_FILE);
   }
 
   exit(0);

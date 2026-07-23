@@ -6,10 +6,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+
 #define SERVER_FIFO "/tmp/seqnum_sv"
 #define CLIENT_FIFO_TEMPLATE "/tmp/client.%ld"
 #define CLIENT_FIFO_NAME_LEN (sizeof(CLIENT_FIFO_TEMPLATE) + 20)
-
+#define BACKUP_FILE "/tmp/backup_seqnum.txt"
 
 struct request {
   pid_t pid;
